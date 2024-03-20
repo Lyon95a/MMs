@@ -38,11 +38,11 @@ qiime dada2 denoise-paired \
   --p-trunc-len-r $reverse_end \
   --p-trim-left-f $forward_start \
   --p-trim-left-r $reverse_start \
-  --o-representative-sequences $filter_reads_path$dataset_name'_all-rep-seqs.qza' \
-  --o-denoising-stats $filter_reads_path'denoising-stats.qz' \
-  --o-table $filter_reads_path$dataset_name'_merged-table.qza' \
+  --o-representative-sequences $filter_reads_path$dataset_name'_all_rep_seqs.qza' \
+  --o-denoising-stats $filter_reads_path'denoising_stats.qz' \
+  --o-table $filter_reads_path$dataset_name'_merged_table.qza' \
   --p-n-threads $core
 
 qiime metadata tabulate \
-  --m-input-file $filter_reads_path"denoising-stats.qz.qza" \
+  --m-input-file $filter_reads_path"denoising_stats.qz.qza" \
   --o-visualization $vis_path"denoise.qzv"

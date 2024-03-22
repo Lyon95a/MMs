@@ -10,16 +10,16 @@ with open(arg1, 'r') as file:
     
 row_name = tsv_data[4].split('\t')[0]
 row_values = list(map(float, tsv_data[4].strip().split('\t')[1:]))
-row_values = ['NA' if value < 20 else value for value in row_values]
+row_values1 = ['NA' if value < 20 else value for value in row_values]
 
 mid=100
-na_indices = [i for i, value in enumerate(row_values) if value == 'NA']
+na_indices = [i for i, value in enumerate(row_values1) if value == 'NA']
 
 before = [i for i in na_indices if i < mid]
 after = [i for i in na_indices if i >= mid]
 
 start = max(before) + 2 if before else 1
-end = min(after) if after else max(after)
+end = min(after) if after else len(row_values)
 
 print(f"{start},{end}")
 

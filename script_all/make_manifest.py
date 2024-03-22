@@ -27,8 +27,10 @@ for i, row in df.iterrows():
     df1.loc[i, 'forward-absolute-filepath'] = full_path_F
     df1.loc[i, 'reverse-absolute-filepath'] = full_path_R
 
+df_unique = df1.drop_duplicates(subset=['sample-id'])
+
 father_path=os.path.dirname(file_path)
 out_path=os.path.join(father_path, 'manifest.tsv')
-df.to_csv(out_path, sep='\t', index=False)
+df_unique.to_csv(out_path, sep='\t', index=False)
 
 

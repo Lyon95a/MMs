@@ -24,8 +24,6 @@ do
     esac
 done
 
-set -x
-
 if [[ ! "$father_path" =~ /$ ]]; then
     father_path="$father_path/"
 fi
@@ -52,48 +50,4 @@ mismatch=3
 # install them first and import it  
 source /home/data/t230307/miniconda3/etc/profile.d/conda.sh
 conda activate qiime2_amplicon
-
-########################################################################################################
-#download sra data-->unzip to fq formate
-echo "step1"
-bash $script_path'dl_sra_to_fq.sh' -p $path -a $acc
-echo "step1 finished"
-
-#make manifest file 
-echo "step2"
-bash $script_path'make_manifest.sh' -p $path -s $script_path
-echo "step2 finished"
-
-
-conda deactivate
-echo "sleep for 2 min"
-sleep 3m
-conda activate qiime2_amplicon
-
-#detect primer is cleaned or not 
-echo "step3"
-bash $script_path'primer_detection.sh' -p $path -m $mismatch -f $F_primer
-echo "step3 finished"
-
-# import to qiime2
-echo "step4"
-bash $script_path'import_to_qiime.sh' -p $path
-echo "step4 finished"
-
-
-# cut primer
-echo "step5"
-bash $script_path'cut_primer.sh' -p $path -f $F_primer -r $R_primer -c 8 -e 0.1
-echo "step5 finished"
-
-#get trim position for both side of reads
-echo "step6"
-bash $script_path'Trim_pos_decied.sh' -p $path -s $script_path
-echo "step6 finished"
-
-#denoise
-echo "step7"
-bash $script_path'denoise.sh' -p $path -d $dataset_name -c 8
-echo "step7 finished"
-
-exit 
+echo "test"

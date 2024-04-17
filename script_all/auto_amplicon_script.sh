@@ -96,4 +96,4 @@ echo "step7"
 bash $script_path'denoise.sh' -p $path -d $dataset_name -c 8
 echo "step7 finished"
 
-exit 
+exit

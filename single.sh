@@ -68,4 +68,4 @@ echo "step6 finished"
 #denoise
 echo "step7"
 bash $script_path'denoise.sh' -p $path -d $dataset_name -c 8
-echo "step7 finished"
+echo "step7 finished"x

@@ -1,40 +1,20 @@
 #!/bin/bash
+##################################################
+#            user setting
 
-while getopts ":m:s:d:a:f:r:" opt
-do
-    case $opt in
-        m)
-        metafile=$OPTARG
-        ;;
-        s)
-        script_path=$OPTARG
-        ;;
-        d)
-        Data_col_name=$OPTARG
-        ;;
-        a)
-        sra=$OPTARG
-        ;;
-        f)
-        forward=$OPTARG
-        ;;
-        r)
-        reverse=$OPTARG
-        ;;
-        ?)
-        echo "未知参数"
-        exit 1;;
-    esac
-done
-
-
-set -x
-
-
+#            environment setting
 source /home/data/t230307/miniconda3/etc/profile.d/conda.sh
 echo "activate environment"
 conda activate qiime2_amplicon
-echo "activate environment1"
+
+source /home/data/t230307/M_Ms/script_all/amplicon.sh
+
+
+
+#             parameter setting
+script_path="/home/data/t230307/M_Ms/script_all/"
+metafile="/home/data/t230307/test/test1.csv"
+##################################################
 
 
 
@@ -44,21 +24,16 @@ meta_file_basename=$(basename "$metafile")
 if [[ ! "$father_path" =~ /$ ]]; then
     father_path="$father_path/"
 fi
+# At here, set column name to each variable
+python $script_path"make_clean_meta1.py" $metafile "Datasets_ID" "Bioproject" "SRA_Number" "Biosample"
 
-python $script_path"make_clean_meta.py" $metafile $Data_col_name $sra $forward $reverse
-
+echo $father_path"datasets_ID.txt"
 while IFS= read -r line; do
-    F_primer=""
-    R_primer=""
-    dataset_name=""
-    F_primer=$(echo "$line" | awk '{print $2}')
-    R_primer=$(echo "$line" | awk '{print $3}')
-    dataset_name=$(echo "$line" | awk '{print $1}')
-    if [ -n "$F_primer" ]; then
-        bash $script_path'auto_amplicon_script.sh' -p $father_path -d $dataset_name -s $script_path -f $F_primer -r $R_primer > $father_path$dataset_name'_output.log'
-    else
-        continue
-    fi
-done < $father_path'primer.tsv'
-
-# bash $script_path'auto_amplicon_script.sh' -p $father_path -d $dataset_name -s $script_path -f $F_primer -r $R_primer 
+    dataset_ID=$(echo "$line" | cut -f1)
+    dataset_path=$father_path$dataset_ID"/"
+    sra_file_name=$dataset_ID"_sra.txt"
+    cd $dataset_path
+    echo $dir_path
+    dl_sra_to_fq -d $dataset_path -s $script_path -a $sra_file_name -e 0.1 -c 12
+    cd $path
+done < $father_path"datasets_ID.txt"

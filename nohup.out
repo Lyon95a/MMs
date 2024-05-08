@@ -1,0 +1,9 @@
+activate environment
+Traceback (most recent call last):
+  File "/home/data/t230307/M_Ms/script_all/make_clean_meta1.py", line 20, in <module>
+    np.savetxt("{directory_path}/datasets_ID.txt", datasets, fmt="%s")
+  File "<__array_function__ internals>", line 200, in savetxt
+  File "/home/data/t230307/miniconda3/envs/qiime2_amplicon/lib/python3.8/site-packages/numpy/lib/npyio.py", line 1541, in savetxt
+    open(fname, 'wt').close()
+FileNotFoundError: [Errno 2] No such file or directory: '{directory_path}/datasets_ID.txt'
+auto_not_work.sh: line 30: read: read error: 0: Bad file descriptor

@@ -26,7 +26,7 @@ mkdir -p $fastq_path
 
 while read line || [[ -n $line ]]; do
     cleaned_line=$(echo "$line" | tr -cd '[:print:]')
-    download_command="prefetch -O $path $cleaned_line"
+    download_command="prefetch -O $path $cleaned_line --force all"
 
     while true; do
         $download_command

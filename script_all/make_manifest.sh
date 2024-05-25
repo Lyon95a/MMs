@@ -20,6 +20,7 @@ cd $path
 fastq_path=$path"ori_fastq/"
 mkdir -p $path"temp/temp_file"
 temp_file_path=$path"temp/temp_file/"
+fastp_path=$path"temp/fastp_out/"
 
-find $fastq_path -type f > $temp_file_path"file_paths.txt"
-python $script_path"make_manifest.py" $temp_file_path"file_paths.txt" $fastq_path 
+find $fastp_path -type f > $temp_file_path"file_paths.txt"
+python $script_path"make_manifest.py" $temp_file_path"file_paths.txt" $fastp_path 

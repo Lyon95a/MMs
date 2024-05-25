@@ -20,10 +20,10 @@ suffix_forw='_1.fastq'
 suffix_reverse='_2.fastq'
 for i, row in df.iterrows():
     basenames = os.path.basename(row[0]) 
-    sample = basenames.split('_')
-    df1.loc[i, 'sample-id'] = sample[0]
-    full_path_F = path1 + sample[0] + suffix_forw
-    full_path_R = path1 + sample[0] + suffix_reverse
+    sample = basenames.rsplit('_', 1)[0]
+    df1.loc[i, 'sample-id'] = sample
+    full_path_F = path1 + sample + suffix_forw
+    full_path_R = path1 + sample + suffix_reverse
     df1.loc[i, 'forward-absolute-filepath'] = full_path_F
     df1.loc[i, 'reverse-absolute-filepath'] = full_path_R
 

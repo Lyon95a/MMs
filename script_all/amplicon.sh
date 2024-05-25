@@ -2,29 +2,32 @@
 
 
 dl_sra_to_fq() {
-    while getopts ":d:s:a:e:c:" opt
-    do
-      case $opt in
-          d)
-          dir_path=$OPTARG
-          ;;
-          s)
-          script_path=$OPTARG
-          ;;
-          a)
-          acc=$OPTARG
-          ;;
-          e)
-          error=$OPTARG
-          ;;
-          c)
-          core=$OPTARG
-          ;;
-          ?)
-          echo "Unknown Parameter"
-          exit 1;;
-      esac
+    OPTIND=1
+    local dir_path script_path acc error core
+    while getopts ":d:s:a:e:c:" opt;do
+        case $opt in
+            d)
+                dir_path=$OPTARG
+                ;;
+            s)
+                script_path=$OPTARG
+                ;;
+            a)
+                acc=$OPTARG
+                ;;
+            e)
+                error=$OPTARG
+                ;;
+            c)
+                core=$OPTARG
+                ;;
+            ?)
+                echo "Unknown Parameter: -$OPTARG"
+                return 1
+                ;;
+        esac
     done
+
     cd $dir_path
     echo $dir_path
     echo $dir_path$acc
@@ -35,7 +38,9 @@ dl_sra_to_fq() {
     mkdir -p $fastq_path
     mkdir -p $dir_path"temp1/"
     temp_dl_path=$dir_path"temp1/"
-    while read line || [[ -n $line ]]; do
+    exec 3<"$dir_path$acc"
+
+    while read -u 3 line || [[ -n $line ]]; do
         cleaned_line=$(echo "$line" | tr -cd '[:print:]')
         cleaned_line_sra=$(echo "$line" | cut -f1)
         cleaned_line_rename=$(echo "$line" | cut -f2)
@@ -47,11 +52,16 @@ dl_sra_to_fq() {
                 break
             else
                 echo "Download of $cleaned_line failed. Retrying..."
+                sleep 5
             fi
-            sleep 5
         done
-    done < "$dir_path$acc"
-    # remove empty data folder
+        for file in "$(find $temp_dl_path -type f -name "*.sra")"; do
+            basename_sra=$(basename "$file")
+            new_name=$cleaned_line_rename"_"$basename_sra
+            mv $file $temp_dl_path$new_name
+            mv $temp_dl_path$new_name $ori_path
+        done
+    done
     rm -r $temp_dl_path
     # unzip sra to fastq
     for file in "$(find $ori_path -type f -name "*.sra")"; do
@@ -63,28 +73,30 @@ dl_sra_to_fq() {
 
 # Define function 2
 fastq_to_fastp() {
-    while getopts ":d:s:a:e:c:" opt
-    do
-      case $opt in
-          d)
-          dir_path=$OPTARG
-          ;;
-          s)
-          script_path=$OPTARG
-          ;;
-          a)
-          acc=$OPTARG
-          ;;
-          e)
-          error=$OPTARG
-          ;;
-          c)
-          core=$OPTARG
-          ;;
-          ?)
-          echo "Unknown Parameter"
-          exit 1;;
-      esac
+    OPTIND=1
+    local dir_path script_path acc error core
+    while getopts ":d:s:a:e:c:" opt;do
+        case $opt in
+            d)
+                dir_path=$OPTARG
+                ;;
+            s)
+                script_path=$OPTARG
+                ;;
+            a)
+                acc=$OPTARG
+                ;;
+            e)
+                error=$OPTARG
+                ;;
+            c)
+                core=$OPTARG
+                ;;
+            ?)
+                echo "Unknown Parameter"
+                exit 1
+                ;;
+        esac
     done
     cd $dir_path
     fastq_path=$dir_path"ori_fastq/"
@@ -103,61 +115,65 @@ fastq_to_fastp() {
 
 # Define function 3
 make_manifest() {
-    while getopts ":d:s:a:e:c:" opt
-    do
-      case $opt in
-          d)
-          dir_path=$OPTARG
-          ;;
-          s)
-          script_path=$OPTARG
-          ;;
-          a)
-          acc=$OPTARG
-          ;;
-          e)
-          error=$OPTARG
-          ;;
-          c)
-          core=$OPTARG
-          ;;
-          ?)
-          echo "Unknown Parameter"
-          exit 1;;
-      esac
+    OPTIND=1
+    local dir_path script_path acc error core
+    while getopts ":d:s:a:e:c:" opt;do
+        case $opt in
+            d)
+                dir_path=$OPTARG
+                ;;
+            s)
+                script_path=$OPTARG
+                ;;
+            a)
+                acc=$OPTARG
+                ;;
+            e)
+                error=$OPTARG
+                ;;
+            c)
+                core=$OPTARG
+                ;;
+            ?)
+                echo "Unknown Parameter"
+                exit 1
+                ;;
+        esac
     done
     cd $dir_path
     fastp_out_path=$dir_path"temp/fastp_out/"
     fastq_path=$dir_path"ori_fastq/"
     mkdir -p $dir_path"temp/temp_file"
     temp_file_path=$dir_path"temp/temp_file/"
-    find $fastq_path -type f > $temp_file_path"file_paths.txt"
+    find $fastp_out_path -type f > $temp_file_path"file_paths.txt"
     python $script_path"make_manifest.py" $temp_file_path"file_paths.txt" $fastp_out_path
 }
 
 primer_detection() {
-    while getopts ":d:s:a:e:c:" opt
-    do
-      case $opt in
-          d)
-          dir_path=$OPTARG
-          ;;
-          s)
-          script_path=$OPTARG
-          ;;
-          a)
-          acc=$OPTARG
-          ;;
-          e)
-          error=$OPTARG
-          ;;
-          c)
-          core=$OPTARG
-          ;;
-          ?)
-          echo "Unknown Parameter"
-          exit 1;;
-      esac
+    OPTIND=1
+    local dir_path script_path acc error core
+    while getopts ":d:s:a:e:c:" opt;do
+        case $opt in
+            d)
+                dir_path=$OPTARG
+                ;;
+            s)
+                script_path=$OPTARG
+                ;;
+            a)
+                acc=$OPTARG
+                ;;
+            e)
+                error=$OPTARG
+                ;;
+            c)
+                core=$OPTARG
+                ;;
+            ?)
+                echo "Unknown Parameter"
+                exit 1
+                ;;
+        esac
     done
     cd $dir_path
     temp_file_path=$dir_path"temp/temp_file/"
@@ -170,28 +186,30 @@ primer_detection() {
 }
 
 import_to_qiime2() {
-    while getopts ":d:s:a:e:c:" opt
-    do
-      case $opt in
-          d)
-          dir_path=$OPTARG
-          ;;
-          s)
-          script_path=$OPTARG
-          ;;
-          a)
-          acc=$OPTARG
-          ;;
-          e)
-          error=$OPTARG
-          ;;
-          c)
-          core=$OPTARG
-          ;;
-          ?)
-          echo "Unknown Parameter"
-          exit 1;;
-      esac
+    OPTIND=1
+    local dir_path script_path acc error core
+    while getopts ":d:s:a:e:c:" opt;do
+        case $opt in
+            d)
+                dir_path=$OPTARG
+                ;;
+            s)
+                script_path=$OPTARG
+                ;;
+            a)
+                acc=$OPTARG
+                ;;
+            e)
+                error=$OPTARG
+                ;;
+            c)
+                core=$OPTARG
+                ;;
+            ?)
+                echo "Unknown Parameter"
+                exit 1
+                ;;
+        esac
     done
     cd $dir_path
     temp_path=$dir_path"temp/"
@@ -207,6 +225,8 @@ import_to_qiime2() {
 }
 
 qiime_trim() {
+    OPTIND=1
+    local dir_path script_path acc error core
     while getopts ":d:s:a:e:c:" opt
     do
       case $opt in
@@ -242,34 +262,37 @@ qiime_trim() {
         --i-demultiplexed-sequences $qza_path"merge.qza" \
         --p-cores $core \
         --p-error-rate $error \
-        --p-discard-untrimmed \
+        --p-quality-cutoff-5end 15 \
+        --p-quality-cutoff-3end 15 \
         --o-trimmed-sequences $qza_primer_removal_path"trimmed-seqs.qza"\
         --verbose
 }
 
 Trim_pos_decied() {
-    while getopts ":d:s:a:e:c:" opt
-    do
-      case $opt in
-          d)
-          dir_path=$OPTARG
-          ;;
-          s)
-          script_path=$OPTARG
-          ;;
-          a)
-          acc=$OPTARG
-          ;;
-          e)
-          error=$OPTARG
-          ;;
-          c)
-          core=$OPTARG
-          ;;
-          ?)
-          echo "Unknown Parameter"
-          exit 1;;
-      esac
+    OPTIND=1
+    local dir_path script_path acc error core
+    while getopts ":d:s:a:e:c:" opt;do
+        case $opt in
+            d)
+                dir_path=$OPTARG
+                ;;
+            s)
+                script_path=$OPTARG
+                ;;
+            a)
+                acc=$OPTARG
+                ;;
+            e)
+                error=$OPTARG
+                ;;
+            c)
+                core=$OPTARG
+                ;;
+            ?)
+                echo "Unknown Parameter"
+                exit 1
+                ;;
+        esac
     done
     cd $dir_path
     temp_path=$dir_path"temp/"
@@ -302,32 +325,34 @@ Trim_pos_decied() {
     echo "reverse end at: $reverse_end"
 
     echo "$forward_start $forward_end $reverse_start $reverse_end" > $temp_file_path'Trim_position.txt'
-
+    
 }
 
 denoise() {
-    while getopts ":d:s:a:e:c:" opt
-    do
-      case $opt in
-          d)
-          dir_path=$OPTARG
-          ;;
-          s)
-          script_path=$OPTARG
-          ;;
-          a)
-          acc=$OPTARG
-          ;;
-          e)
-          error=$OPTARG
-          ;;
-          c)
-          core=$OPTARG
-          ;;
-          ?)
-          echo "Unknown Parameter"
-          exit 1;;
-      esac
+    OPTIND=1
+    local dir_path script_path acc error core
+    while getopts ":d:s:a:e:c:" opt;do
+        case $opt in
+            d)
+                dir_path=$OPTARG
+                ;;
+            s)
+                script_path=$OPTARG
+                ;;
+            a)
+                acc=$OPTARG
+                ;;
+            e)
+                error=$OPTARG
+                ;;
+            c)
+                core=$OPTARG
+                ;;
+            ?)
+                echo "Unknown Parameter"
+                exit 1
+                ;;
+        esac
     done
     cd $dir_path
     temp_path=$dir_path"temp/"
@@ -357,28 +382,30 @@ denoise() {
 }
 
 denoise_view() {
-    while getopts ":d:s:a:e:c:" opt
-    do
-      case $opt in
-          d)
-          dir_path=$OPTARG
-          ;;
-          s)
-          script_path=$OPTARG
-          ;;
-          a)
-          acc=$OPTARG
-          ;;
-          e)
-          error=$OPTARG
-          ;;
-          c)
-          core=$OPTARG
-          ;;
-          ?)
-          echo "Unknown Parameter"
-          exit 1;;
-      esac
+    OPTIND=1
+    local dir_path script_path acc error core
+    while getopts ":d:s:a:e:c:" opt;do
+        case $opt in
+            d)
+                dir_path=$OPTARG
+                ;;
+            s)
+                script_path=$OPTARG
+                ;;
+            a)
+                acc=$OPTARG
+                ;;
+            e)
+                error=$OPTARG
+                ;;
+            c)
+                core=$OPTARG
+                ;;
+            ?)
+                echo "Unknown Parameter"
+                exit 1
+                ;;
+        esac
     done
     cd $dir_path
     temp_path=$dir_path"temp/"

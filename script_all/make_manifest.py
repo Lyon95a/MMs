@@ -3,19 +3,25 @@ import os
 import sys
 args = sys.argv
 
-if len(args) > 1:
-    arg1 = args[1]
-    arg2 = args[2]
+if len(sys.argv) < 4:
+    print("Usage: script.py <file_path> <path1> <dataset_name>")
+    sys.exit(1)
 
-file_path = arg1
-df = pd.read_csv(file_path, sep='\t',header=None)
+file_path, path1, dataset_name = sys.argv[1], sys.argv[2], sys.argv[3]
+
+print(dataset_name)
+
+try:
+    df = pd.read_csv(file_path, sep='\t', header=None)
+except Exception as e:
+    print(f"Failed to read the file: {e}")
+    sys.exit(1)
 
 df1 = pd.DataFrame({})
 df1['sample-id'] = ''
 df1['forward-absolute-filepath'] = ''
 df1['reverse-absolute-filepath'] = ''
 
-path1=arg2
 suffix_forw='_1.fastq'
 suffix_reverse='_2.fastq'
 for i, row in df.iterrows():
@@ -30,7 +36,8 @@ for i, row in df.iterrows():
 df_unique = df1.drop_duplicates(subset=['sample-id'])
 
 father_path=os.path.dirname(file_path)
-out_path=os.path.join(father_path, 'manifest.tsv')
+out_path=os.path.join(father_path, f"{dataset_name}_manifest.tsv")
+print(out_path)
 df_unique.to_csv(out_path, sep='\t', index=False)
 
 
